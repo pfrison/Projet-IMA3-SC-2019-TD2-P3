@@ -22,3 +22,15 @@ Une fois les coordonnées X et Y des points projetés sur l'écran, le moteur de
 
 En répétant l'opération régulièrement et en modifiant les coordonnées des points ou les angles ou la distance de la caméra à la scène, on obtient une animation.
 
+## Controleur audio Android
+
+La caméra pourrait servir à contrôler divers appareils. Pour en faire la démonstration, nous nous somme aventuré à la création d'une application Android qui serait capable de lire des données affichées sur une page web générée par la Raspberry et d'interpréter ces données en commande pour le lecteur audio d'Android.
+
+Nous avons pensé à trois commandes basiques :
+
+* lecture et pause lorsqu'un objet (une main par exemple) obscurcit brièvement la vision au centre de la caméra
+* lecture de la chanson suivante lorsqu'un objet obscurcit la caméra de la gauche vers la droite
+* lecture de la chanson précédente lorsqu'un objet obscurcit la caméra de la droite vers la gauche
+
+À l'heure actuelle, le programme affiche seulement l'écran de déboguage et est capable de contrôler le lecteur audio d'Android.
+

@@ -1,0 +1,238 @@
+<html>
+	<head>
+		<meta charset="utf-8"/>
+		<style>
+			#canvas3d {
+				border: 1px solid #000000;
+			}
+		</style>
+		<script>
+			/* ----- initialisation / main ----- */
+			
+			//définition de la caméra
+			var rotTheta = 0 * 0.017453; //les rotations suivant les 3 axes des coordonnées sphériques
+			var rotPhi = 0 * 0.017453; //0,017453 = 2pi/360 (deg -> rad)
+			var rotPsi = 0 * 0.017453;
+			var transRho = 8; //la distance de la caméra avec l'origine
+			var tirageMecanique = 10; //la distance entre le point de focalisation et le canvas
+			
+			//définition des objets à dessiner
+			var points = [ //coordonnées X, Y et Z
+				[-1, -1, -1],
+				[1, -1, -1],
+				[-1, 1, -1],
+				[1, 1, -1],
+				[-1, -1, 1],
+				[1, -1, 1],
+				[-1, 1, 1],
+				[1, 1, 1]
+			];
+			var lignes = [ //ID des points du tableau "points"
+				[0, 1],
+				[1, 3],
+				[3, 2],
+				[2, 0],
+				[4, 5],
+				[5, 7],
+				[7, 6],
+				[6, 4],
+				[0, 4],
+				[1, 5],
+				[2, 6],
+				[3, 7]
+			];
+			var polygones = [ //ID des lignes du tableau "points"
+				[0, 1, 3, 2],
+				[4, 5, 7, 6],
+				[0, 1, 5, 4],
+				[1, 3, 7, 5],
+				[3, 2, 6, 7],
+				[2, 0, 4, 6]
+			];
+			
+			//définition du canvas
+			var canvas;
+			var canvasEchelle = 100;
+			
+			//fonction appellée après le chargement du HTML
+			function initialisation(){
+				canvas = document.getElementById("canvas3d");
+				rafrechissement();
+			}
+			
+			//Rafrechissement infinit du canvas
+			function rafrechissement(){
+				rotTheta += 0.01;
+				rotPhi += 0.007;
+				rotTheta += 0.002;
+				
+				//clone des points
+				var pointsCalcule = [];
+				for (var i = 0; i < points.length; i++)
+					pointsCalcule.push([points[i][0], points[i][1], points[i][2]]);
+				
+				//application des transformations et projection sur le canvas
+				matRot = getMatriceRotation(rotTheta, rotPhi, rotPsi);
+				pointsCalcule = appliqueRotationPoints(matRot, pointsCalcule);
+				pointsCalcule = appliqueTranslationRhoPoints(transRho, pointsCalcule);
+				pointsCalcule = projectionCanvasPoints(tirageMecanique, canvas, canvasEchelle, pointsCalcule);
+				
+				//efface le canvas
+				var canvasContext = canvas.getContext("2d");
+				canvasContext.clearRect(0, 0, canvas.width, canvas.height);
+				
+				//dessin des objets sur le canvas
+				dessinCanvasPoints(canvas, pointsCalcule);
+				dessinCanvasLignes(canvas, lignes, pointsCalcule);
+				dessinCanvasPolygones(canvas, polygones, lignes, pointsCalcule),
+				
+				setTimeout(rafrechissement, 10);
+			}
+			
+			/* ----- fonctions JavaScript ----- */
+			
+			/**
+			 * Retourne une matrice de rotation en fonction des rotations données en paramètre
+			 */
+			function getMatriceRotation(rotTheta, rotPhi, rotPsi){
+				//définition des matrices de rotation
+				var matriceRotPhi = [
+					[1, 0               , 0                ],
+					[0, Math.cos(rotPhi), -Math.sin(rotPhi)],
+					[0, Math.sin(rotPhi), Math.cos(rotPhi) ]
+				];
+				var matriceRotTheta = [
+					[Math.cos(rotTheta) , 0, Math.sin(rotTheta)],
+					[0                  , 1, 0                 ],
+					[-Math.sin(rotTheta), 0, Math.cos(rotTheta)]
+				];
+				var matriceRotPsi = [
+					[Math.cos(rotPsi), -Math.sin(rotPsi), 0],
+					[Math.sin(rotPsi), Math.cos(rotPsi) , 0],
+					[0               , 0                , 1]
+				];
+				
+				//multiplication des matrices
+				var matriceRotThetaPhi = [[0, 0, 0], [0, 0, 0], [0, 0, 0]];
+				for (var i = 0; i < 3; i++){
+					for (var j = 0; j < 3; j++){
+						var somme = 0;
+						for (var k = 0; k < 3; k++)
+							somme += matriceRotTheta[i][k] * matriceRotPhi[k][j];
+						matriceRotThetaPhi[i][j] = somme;
+					}
+				}
+				var matriceRotFinale = [[0, 0, 0], [0, 0, 0], [0, 0, 0]];
+				for (var i = 0; i < 3; i++){
+					for (var j = 0; j < 3; j++){
+						var somme = 0;
+						for (var k = 0; k < 3; k++)
+							somme += matriceRotThetaPhi[i][k] * matriceRotPsi[k][j];
+						matriceRotFinale[i][j] = somme;
+					}
+				}
+				
+				return matriceRotFinale;
+			}
+			
+			/**
+			 * Applique la rotation sur les points données en paramètre
+			 */
+			function appliqueRotationPoints(matRot, pointsCalcule){
+				for (var i = 0; i < pointsCalcule.length; i++){
+					//clone pointsCalcule
+					var pointsCalcule2 = [];
+					for (var j = 0; j < 3; j++){
+						var somme = 0;
+						for (var k = 0; k < 3; k++)
+							somme += pointsCalcule[i][k] * matRot[k][j];
+						pointsCalcule2.push(somme);
+					}
+					pointsCalcule[i] = pointsCalcule2;
+				}
+				return pointsCalcule;
+			}
+			
+			/**
+			 * Applique la translation suivant rho sur les points données en paramètre
+			 */
+			function appliqueTranslationRhoPoints(transRho, pointsCalcule){
+				for (var i = 0; i < pointsCalcule.length; i++)
+					pointsCalcule[i][2] += transRho;
+				return pointsCalcule;
+			}
+			
+			/**
+			 * Projette les points données en paramètre sur le canvas.
+			 */
+			function projectionCanvasPoints(tirageMecanique, canvas, canvasEchelle, pointsCalcule){
+				for (var i = 0; i < pointsCalcule.length; i++){
+					var echelleTirage = tirageMecanique / pointsCalcule[i][2];
+					pointsCalcule[i][0] = pointsCalcule[i][0]*canvasEchelle*echelleTirage + canvas.width/2;
+					pointsCalcule[i][1] = pointsCalcule[i][1]*canvasEchelle*echelleTirage + canvas.height/2;
+				}
+				return pointsCalcule;
+			}
+			
+			/**
+			 * Dessine les points données en paramètre sur le canvas
+			 */
+			function dessinCanvasPoints(canvas, pointsCalcule){
+				var canvasContext = canvas.getContext("2d");
+				canvasContext.fillStyle = "#0000FFFF";
+				var diametre = 3;
+				for (var i = 0; i < pointsCalcule.length; i++){
+					canvasContext.beginPath();
+					canvasContext.arc(pointsCalcule[i][0], pointsCalcule[i][1], diametre, 0, 2*Math.PI);
+					canvasContext.fill();
+				}
+				return;
+			}
+			
+			/**
+			 * Dessine les lignes données en paramètre sur le canvas
+			 */
+			function dessinCanvasLignes(canvas, lignes, pointsCalcule){
+				var canvasContext = canvas.getContext("2d");
+				canvasContext.lineWidth = 2;
+				canvasContext.strokeStyle = "#00FF0010";
+				for (var i = 0; i < lignes.length; i++){
+					var point1 = pointsCalcule[lignes[i][0]];
+					var point2 = pointsCalcule[lignes[i][1]];
+					canvasContext.moveTo(point1[0], point1[1]);
+					canvasContext.lineTo(point2[0], point2[1]);
+					canvasContext.stroke();
+				}
+				return;
+			}
+			
+			/**
+			 * Dessine les polygones données en paramètre sur le canvas
+			 */
+			function dessinCanvasPolygones(canvas, polygones, lignes, pointsCalcule){
+				var canvasContext = canvas.getContext("2d");
+				canvasContext.fillStyle = "#FF000005";
+				for (var i = 0; i < polygones.length; i++){
+					var polyLignes = polygones[i];
+					
+					var point = pointsCalcule[polyLignes[0]];
+					canvasContext.moveTo(point[0], point[1]);
+					for (var j = 0; j < polyLignes.length; j++){
+						var point = pointsCalcule[polyLignes[j]];
+						canvasContext.lineTo(point[0], point[1]);
+					}
+					
+					canvasContext.fill();
+				}
+				return;
+			}
+		</script>
+	</head>
+	
+	<body onload="initialisation()">
+		<h1>Moteur3D test</h1>
+		<center>
+			<canvas id="canvas3d" width="500" height="500">Votre navigateur ne supporte pas les canvas.</canvas>
+		</center>
+	</body>
+</html>

@@ -5,7 +5,7 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="5dp">
 
@@ -39,6 +39,19 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
+            android:text="Image décodée :"
+            android:textColor="@android:color/black" />
+
+        <LinearLayout
+            android:id="@+id/rootImage"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
             android:text="Controleur audio :"
             android:textColor="@android:color/black" />
 
@@ -49,6 +62,7 @@
             android:orientation="horizontal">
 
             <ImageButton
+                android:contentDescription="prev"
                 android:id="@+id/prev"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
@@ -56,6 +70,7 @@
                 android:src="@drawable/ic_skip_previous_black_24dp" />
 
             <ImageButton
+                android:contentDescription="play"
                 android:id="@+id/play"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
@@ -63,6 +78,7 @@
                 android:src="@drawable/ic_play_arrow_black_24dp" />
 
             <ImageButton
+                android:contentDescription="next"
                 android:id="@+id/next"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"

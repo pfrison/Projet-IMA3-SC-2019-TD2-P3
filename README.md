@@ -2,6 +2,20 @@
 
 Github du groupe P3 TD2 en IM3 à Polytech Lille pour le projet SC de l'année 2019.
 
+## Codes Arduino
+
+La carte Arduino est utilisée pour récupérer les valeurs de photorésistance par le biais de ponts diviseurs connectés à chacune de ces entrées analogiques. La tension à une entrée analogique est donc fonction de et uniquement de la valeur des photorésistances.
+
+Pour relier plusieurs capteurs, il nous a fallu utiliser un multiplexage réalisé avec des transistors. Ainsi, 5 capteurs sont branchés en parallèle et les ports digitaux de l'Arduino permettent de contrôler le passage du courant dans chaque capteur.
+
+Le premier programme "Camera_test" nous a servi de tester notre carte électronique. Il transmet une visualisation avec des caractères ASCII de l'image reconstituée par l'Arduino. Le texte ASCII représentant l'image est envoyé à l'ordinateur par liaison série. Pour une meilleure visualisation, la programme ajuste le contraste de l'image : il définit le pixel le plus clair comme la valeur la plus haute enregistré depuis le lancement du programme (réciproquement, le noir correspond à la valeur la plus basse depuis le lancement).
+
+Le second programme "Camera_serial" envoie les informations brutes des capteurs. Ce sera à la Raspberry ou tout autre appareil branché au port série de faire son propre calcul du contraste. Les informations sont envoyées selon le format suivant (toutes les valeurs (captXX) sont des entiers de 0 à 1024) :
+
+    capt00-capt01-capt02-capt03-capt04-capt10-capt11-...-capt55   //image à t = 0
+    capt00-capt01-capt02-capt03-capt04-capt10-capt11-...-capt55   //image à t = 1
+    capt00-capt01-capt02-capt03-capt04-capt10-capt11-...-capt55   //image à t = 2
+
 ## Moteur graphique 3D
 
 Un bon moyen de visualisation des données reçues de la caméra est un graphique en 3D. De cette manière, on pourrait théoriquement visualiser le profil de l'objet devant la caméra.

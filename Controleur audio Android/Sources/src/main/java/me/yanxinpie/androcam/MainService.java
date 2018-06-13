@@ -42,8 +42,11 @@ public class MainService extends Service {
     };
 
     private long centreTime = -1;
+    private boolean centreLock = false;
     private long droiteGaucheTime = -1;
+    private boolean droiteGaucheLock = false;
     private long gaucheDroiteTime = -1;
+    private boolean gaucheDroiteLock = false;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -113,7 +116,8 @@ public class MainService extends Service {
                         for (int i = 0; i < imageint.length; i++){
                             for (int j = 0; j < imageint[i].length; j++) {
                                 if (pixelValMax[i][j] - pixelValMin[i][j] != 0)
-                                    image[i][j] = (imageint[i][j] - pixelValMin[i][j]) / (pixelValMax[i][j] - pixelValMin[i][j]);
+                                    image[i][j] = ((double) imageint[i][j] - (double) pixelValMin[i][j])
+                                            / ((double) pixelValMax[i][j] - (double) pixelValMin[i][j]);
                                 else
                                     image[i][j] = 0d;
                             }
@@ -126,12 +130,14 @@ public class MainService extends Service {
                         boolean centre =   image[1][1] < 0.5 && image[1][2] < 0.5 && image[1][3] < 0.5;
                         centre = centre && image[2][1] < 0.5 && image[2][2] < 0.5 && image[2][3] < 0.5;
                         centre = centre && image[3][1] < 0.5 && image[3][2] < 0.5 && image[3][3] < 0.5;
-                        if(centre){
-                            centreTime = SystemClock.currentThreadTimeMillis();
-                        }else if(centreTime != -1 && SystemClock.currentThreadTimeMillis() - centreTime < 1000){
-                            //                       ^^^ l'action doit etre faite en moins de 1 seconde
+                        if(centre && !centreLock){
+                            centreTime = System.currentTimeMillis();
+                            centreLock = true;
+                        }else if(!centre && centreLock && System.currentTimeMillis() - centreTime < 1000){
+                            //                            ^^^ l'action doit etre faite en moins de 1 seconde
                             // oommande play/pause
                             MainActivity.envoisCommandeMusicPlayer(KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE, getBaseContext());
+                            centreLock = false;
                         }
 
                         boolean gauche =   image[0][0] < 0.5;
@@ -147,23 +153,27 @@ public class MainService extends Service {
                         droite = droite && image[4][4] < 0.5;
 
                         // droite vers gauche = precedent
-                        if(droite && !gauche){
-                            droiteGaucheTime = SystemClock.currentThreadTimeMillis();
-                        }else if(gauche && !droite
-                                && droiteGaucheTime != 1 && SystemClock.currentThreadTimeMillis() - droiteGaucheTime < 1000){
-                            //                              ^^^ l'action doit etre faite en moins de 1 seconde
+                        if(droite && !gauche && !droiteGaucheLock){
+                            droiteGaucheTime = System.currentTimeMillis();
+                            droiteGaucheLock = true;
+                        }else if(gauche && !droite && droiteGaucheLock
+                                && System.currentTimeMillis() - droiteGaucheTime < 1000){
+                            //     ^^^ l'action doit etre faite en moins de 1 seconde
                             // oommande prev
                             MainActivity.envoisCommandeMusicPlayer(KeyEvent.KEYCODE_MEDIA_PREVIOUS, getBaseContext());
+                            droiteGaucheLock = false;
                         }
 
                         // gauche vers droite = suivant
-                        if(gauche && !droite){
-                            gaucheDroiteTime = SystemClock.currentThreadTimeMillis();
-                        }else if(droite && !gauche
-                                && gaucheDroiteTime != 1 && SystemClock.currentThreadTimeMillis() - gaucheDroiteTime < 1000){
-                            //                              ^^^ l'action doit etre faite en moins de 1 seconde
-                            // oommande prev
+                        if(gauche && !droite && !gaucheDroiteLock){
+                            gaucheDroiteTime = System.currentTimeMillis();
+                            gaucheDroiteLock = true;
+                        }else if(droite && !gauche && gaucheDroiteLock
+                                && System.currentTimeMillis() - gaucheDroiteTime < 1000){
+                            //     ^^^ l'action doit etre faite en moins de 1 seconde
+                            // oommande next
                             MainActivity.envoisCommandeMusicPlayer(KeyEvent.KEYCODE_MEDIA_NEXT, getBaseContext());
+                            gaucheDroiteLock = false;
                         }
                     }
                 }

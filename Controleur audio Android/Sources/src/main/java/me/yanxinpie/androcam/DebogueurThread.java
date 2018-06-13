@@ -60,7 +60,7 @@ public class DebogueurThread extends Thread implements Runnable {
             } else {
                 for(int i = 0; i < mainActivity.vImage.length; i++){
                     for(int j = 0; j < mainActivity.vImage[i].length; j++){
-                        int color = (int) (MainService.image[i][j] * 0xFF);
+                        int color = (int) (MainService.image[i][j] * 255d);
                         int colorCode = 0xFF000000 | color << 16 | color << 8 | color;
                         mainActivity.vImage[i][j].setBackgroundColor(colorCode);
                     }

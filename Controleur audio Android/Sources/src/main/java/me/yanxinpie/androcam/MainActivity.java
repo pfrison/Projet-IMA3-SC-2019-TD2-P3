@@ -49,6 +49,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
         String url = pref.getString("url", "");
         etURLTexteBrut.setText(url);
+        MainService.URL = url;
 
         // créer l'image
         creerImageSupport();

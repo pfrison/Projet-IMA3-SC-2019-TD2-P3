@@ -1,23 +1,32 @@
 package me.yanxinpie.androcam;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.preference.PreferenceManager;
 import android.util.TypedValue;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 public class MainActivity extends Activity implements View.OnClickListener {
+    EditText etURLTexteBrut;
+    Button btOKURL;
     TextView tvEtatService;
     TextView tvEtatLecture;
-    ImageButton btPrev;
-    ImageButton btPlay;
-    ImageButton btNext;
+    ImageButton ibtPrev;
+    ImageButton ibtPlay;
+    ImageButton ibtNext;
     View[][] vImage = new View[5][5];
+    TextView tvErreur;
 
     private DebogueurThread dbThread = new DebogueurThread(this);
 
@@ -27,19 +36,28 @@ public class MainActivity extends Activity implements View.OnClickListener {
         setContentView(R.layout.activity_main);
 
         // enregistre les TextView et les ImageButton
+        etURLTexteBrut = findViewById(R.id.urltextebrut);
+        btOKURL = findViewById(R.id.urlok);
         tvEtatService = findViewById(R.id.etatService);
         tvEtatLecture = findViewById(R.id.etatlecture);
-        btPrev = findViewById(R.id.prev);
-        btPlay = findViewById(R.id.play);
-        btNext = findViewById(R.id.next);
+        ibtPrev = findViewById(R.id.prev);
+        ibtPlay = findViewById(R.id.play);
+        ibtNext = findViewById(R.id.next);
+        tvErreur = findViewById(R.id.derniereErreur);
+
+        // restauration de la sauvegarde de l'url
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
+        String url = pref.getString("url", "");
+        etURLTexteBrut.setText(url);
 
         // créer l'image
         creerImageSupport();
 
-        // ajout des listeners sur le ImageButton
-        btPrev.setOnClickListener(this);
-        btPlay.setOnClickListener(this);
-        btNext.setOnClickListener(this);
+        // ajout des listeners sur le ImageButton et le Button
+        btOKURL.setOnClickListener(this);
+        ibtPrev.setOnClickListener(this);
+        ibtPlay.setOnClickListener(this);
+        ibtNext.setOnClickListener(this);
 
         // démarre le thread de rafrechisseemnt des informations sur l'écran de deboguage
         dbThread.start();
@@ -57,30 +75,41 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
     @Override
     public void onClick(View v) {
-        if (v == btPrev || v == btPlay || v == btNext) {
+        if(v == btOKURL){
+            MainService.URL = etURLTexteBrut.getText().toString();
+
+            // sauvegarde de l'url
+            SharedPreferences.Editor prefedit = PreferenceManager.getDefaultSharedPreferences(this).edit();
+            prefedit.putString("url", MainService.URL);
+            prefedit.apply();
+
+            // cache le clavier virtuel
+            InputMethodManager inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+        } else if (v == ibtPrev || v == ibtPlay || v == ibtNext) {
             int commande = -1;
-            if (v == btPrev)
+            if (v == ibtPrev)
                 commande = KeyEvent.KEYCODE_MEDIA_PREVIOUS;
-            else if (v == btPlay)
+            else if (v == ibtPlay)
                 commande = KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE;
-            else //btNext
+            else //ibtNext
                 commande = KeyEvent.KEYCODE_MEDIA_NEXT;
-            envoisCommandeMusicPlayer(commande);
+            envoisCommandeMusicPlayer(commande, this);
         }
     }
 
-    private void envoisCommandeMusicPlayer(int commande) {
+    public static void envoisCommandeMusicPlayer(int commande, Context context) {
         long temps = SystemClock.uptimeMillis();
 
         Intent downIntent = new Intent(Intent.ACTION_MEDIA_BUTTON, null);
         KeyEvent downEvent = new KeyEvent(temps, temps, KeyEvent.ACTION_DOWN, commande, 0);
         downIntent.putExtra(Intent.EXTRA_KEY_EVENT, downEvent);
-        sendOrderedBroadcast(downIntent, null);
+        context.sendOrderedBroadcast(downIntent, null);
 
         Intent upIntent = new Intent(Intent.ACTION_MEDIA_BUTTON, null);
         KeyEvent upEvent = new KeyEvent(temps, temps, KeyEvent.ACTION_UP, commande, 0);
         upIntent.putExtra(Intent.EXTRA_KEY_EVENT, upEvent);
-        sendOrderedBroadcast(upIntent, null);
+        context.sendOrderedBroadcast(upIntent, null);
     }
 
     private void creerImageSupport(){

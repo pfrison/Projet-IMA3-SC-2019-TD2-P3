@@ -46,5 +46,8 @@ Nous avons pensé à trois commandes basiques :
 * lecture de la chanson suivante lorsqu'un objet obscurcit la caméra de la gauche vers la droite
 * lecture de la chanson précédente lorsqu'un objet obscurcit la caméra de la droite vers la gauche
 
-À l'heure actuelle, le programme affiche seulement l'écran de déboguage et est capable de contrôler le lecteur audio d'Android.
+L'application démarre sur un panneau de débogage, unique écran (Activity) de l'application, le reste étant géré dans un processus en arrière-plan (Service). Dans le premier champs, il faut y rentrer l'URL où Android pourra récurérer les informations brutes sur le serveur web de la Raspberry. Si l'application arrive à se connecter, elle affichera dans l'écran de débogage diverses informations : valeurs lues en brute, image reconstituée, etc.
 
+Une fois l'application ouverte, l'utilisateur peut la "fermer" : la fermeture "normale" (différente de la fermeture forcé dans le gestionnaire des applications) détruit simplement l'Activity (l'écran de débogage) et non le Service qui va continuer à intérroger la Raspberry et à contrôler le lecteur audio.
+
+Comme énoncé précédemment, le Service est une tâche exécuté en fond qui s'occupe du téléchargement des données brutes, de l'interprétation de l'image (non différente des autres systèmes, cad un calcul de contraste) et du contrôle du lecteur audio d'Android.

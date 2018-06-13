@@ -13,13 +13,34 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="20dp"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="10dp"
             android:gravity="center"
             android:text="Androcam débogueur"
             android:textAllCaps="true"
             android:textColor="@android:color/black"
             android:textSize="20sp"
             android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="URL des valeurs brutes :"
+            android:textColor="@android:color/black" />
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/urltextebrut"
+            android:textColor="@android:color/black" />
+
+        <Button
+            android:layout_marginBottom="20dp"
+            android:text="OK"
+            android:id="@+id/urlok"
+            android:layout_gravity="center_horizontal"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content" />
 
         <TextView
             android:id="@+id/etatService"
@@ -31,7 +52,7 @@
         <TextView
             android:id="@+id/etatlecture"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="60dp"
             android:text="Valeur lue : "
             android:textColor="@android:color/black" />
 
@@ -85,5 +106,17 @@
                 android:layout_weight="1"
                 android:src="@drawable/ic_skip_next_black_24dp" />
         </LinearLayout>
+
+        <TextView
+            android:textColor="@android:color/black"
+            android:text="Dernière erreur :"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/derniereErreur"
+            android:textColor="#D00000"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
     </LinearLayout>
 </ScrollView>

@@ -51,3 +51,7 @@ L'application démarre sur un panneau de débogage, unique écran (Activity) de 
 Une fois l'application ouverte, l'utilisateur peut la "fermer" : la fermeture "normale" (différente de la fermeture forcée dans le gestionnaire des applications) détruit simplement l'Activity (l'écran de débogage) et non le Service qui va continuer à interroger la Raspberry et à contrôler le lecteur audio.
 
 Comme énoncé précédemment, le Service est une tâche exécutée en fond qui s'occupe du téléchargement des données brutes, de l'interprétation de l'image (non différente des autres systèmes, c'est à dire un calcul de contraste) et du contrôle du lecteur audio d'Android.
+
+## Communication série
+
+La communication entre l'Arduino et la raspberry pi est réalisée par la liaison série. Après la réception de données dans la format de chaîne de caractères, l'application web va transformer la chaîne de caractères reçue entre un tableau de 5x5 avec toutes les données en entier. Ces données vont être affichées sur des blocs de 5x5, et chaque donnée correspond une valeur de teinte. Ces 25 blocs vous permet de visualiser le résultat détecté par les 25 photorésistances. 

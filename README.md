@@ -12,9 +12,9 @@ Le premier programme "Camera_test" nous a servi de tester notre carte électroni
 
 Le second programme "Camera_serial" envoie les informations brutes des capteurs. Ce sera à la Raspberry ou tout autre appareil branché au port série de faire son propre calcul du contraste. Les informations sont envoyées selon le format suivant (toutes les valeurs (captXX) sont des entiers de 0 à 1024) :
 
-    capt00-capt01-capt02-capt03-capt04-capt10-capt11-...-capt55   //image à t = 0
-    capt00-capt01-capt02-capt03-capt04-capt10-capt11-...-capt55   //image à t = 1
-    capt00-capt01-capt02-capt03-capt04-capt10-capt11-...-capt55   //image à t = 2
+    capt00-capt01-capt02-capt03-capt04-capt10-capt11-...-capt44   //image à t = 0
+    capt00-capt01-capt02-capt03-capt04-capt10-capt11-...-capt44   //image à t = 1
+    capt00-capt01-capt02-capt03-capt04-capt10-capt11-...-capt44   //image à t = 2
 
 ## Moteur graphique 3D
 

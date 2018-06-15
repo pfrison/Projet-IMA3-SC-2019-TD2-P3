@@ -54,4 +54,4 @@ Comme énoncé précédemment, le Service est une tâche exécutée en fond qui 
 
 ## Communication série
 
-La communication entre l'Arduino et la raspberry pi est réalisée par la liaison série. Après la réception de données dans la format de chaîne de caractères, l'application web va transformer la chaîne de caractères reçue entre un tableau de 5x5 avec toutes les données en entier. Ces données vont être affichées sur des blocs de 5x5, et chaque donnée correspond une valeur de teinte. Ces 25 blocs vous permet de visualiser le résultat détecté par les 25 photorésistances. 
+La communication entre l'Arduino et la Raspberry PI est réalisée par la liaison série. Après la réception de données dans le format de chaîne de caractères, l'application web va transformer la chaîne de caractères reçue vers un tableau 5x5 avec toutes les données en entier. Ces données vont être affichées sur des blocs de 5x5, et chaque donnée correspond à une valeur de teinte. Ces 25 blocs nous permettent de visualiser le résultat détecté par les 25 photorésistances. 
